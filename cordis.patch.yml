@@ -1,0 +1,10 @@
+# DeepSeek Harness bundle layer. Keep this additive: it registers an isolated
+# filesystem skill provider and leaves every existing profile provider intact.
+- insert:
+    - id: novocube-fde-report-style-skill-provider
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        providerName: novocube-fde-report-style
+        includeDefaultRoots: false
+        watch: false
+        bundledSkillDir: !!js process.getBuiltinModule('node:path').join(process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('novocube-fde-report-style/package.json')), 'plugins', 'novocube-fde-report-style', 'skills')

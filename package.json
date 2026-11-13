@@ -1,15 +1,38 @@
 {
-  "name": "novocube-fde-report-style-repo",
-  "version": "0.2.0",
+  "name": "novocube-fde-report-style",
+  "version": "0.2.1",
   "private": true,
-  "description": "Codex and DeepSeek Harness skill repository for the Novocube FDE Markdown-to-PDF report style.",
+  "description": "Codex plugin and installable DeepSeek Harness bundle for the Novocube FDE Markdown-to-PDF report style.",
   "type": "module",
+  "files": [
+    "cordis.patch.yml",
+    ".agents/plugins/marketplace.json",
+    ".dsh/skills/novocube-fde-report-style/SKILL.md",
+    "plugins/novocube-fde-report-style/",
+    "scripts/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
   "scripts": {
     "install:dsh": "node scripts/install-dsh.mjs",
     "validate": "node scripts/validate-repo.mjs"
   },
   "engines": {
     "node": ">=20"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "agent-skill",
+    "markdown",
+    "pdf",
+    "novocube",
+    "fde"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
   },
   "dependencies": {
     "marked": "17.0.5",

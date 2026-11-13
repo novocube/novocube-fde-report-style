@@ -10,7 +10,7 @@
 - 默认使用 `Novocube-fde-report-style`，并把正文中的 `Novocube`/`NOVOCUBE` 规范化为“新魔方”。
 - 默认不显示日期；可用 `--date` 指定日期，或用 `--include-source-date` 采用 Markdown 中的日期。
 - 随插件提供 Noto Sans CJK SC Regular/Bold，渲染时直接加载并嵌入 PDF，用户无需安装字体。
-- 支持 Codex marketplace 和 DSH 原生 `SKILL.md` 发现。
+- 支持 Codex marketplace 和 DSH 原生 bundle 安装；DSH bundle 会自动挂载包内 `SKILL.md`。
 - 使用 Node.js、`marked`、Playwright 和 Chrome/Chromium；Codex 可使用内置运行时，DSH 安装器会安装技能本地依赖。
 
 ## Codex 安装
@@ -30,7 +30,21 @@ codex plugin add novocube-fde-report-style@novocube-fde-report-style
 
 ## DSH 安装
 
-DSH 支持标准 `SKILL.md` 技能。克隆仓库后执行：
+### 作为 DSH 插件安装（推荐）
+
+仓库根包已声明 `dsh.bundle.patch`，安装后会增量注册一个独立技能 provider，自动挂载包内的 `novocube-fde-report-style`：
+
+```bash
+dsh plugin --profile web add 'git+https://github.com/novocube/novocube-fde-report-style.git'
+```
+
+这是 private 仓库，安装机器需先配置 GitHub 访问权限。安装后重启相应 profile，再用 DSH 的 `/skills` 确认技能已出现。
+
+bundle 实体为根目录 `cordis.patch.yml`：它使用已安装 npm 包的绝对位置解析 `bundledSkillDir`，不依赖启动 DSH 时的工作目录，也不会覆盖 profile 已有的技能 provider。
+
+### 仅复制到 DSH 技能目录（备用）
+
+如果不使用 DSH 插件管理器，克隆仓库后也可执行：
 
 ```bash
 npm run install:dsh
@@ -77,6 +91,7 @@ node plugins/novocube-fde-report-style/skills/novocube-fde-report-style/scripts/
 ```text
 .agents/plugins/marketplace.json        Codex marketplace
 .dsh/skills/novocube-fde-report-style/ DSH 项目技能入口
+cordis.patch.yml                        DSH bundle 组合层
 plugins/novocube-fde-report-style/      插件源码
   .codex-plugin/plugin.json             插件清单
   skills/novocube-fde-report-style/     Skill、转换脚本与样式资产
@@ -98,6 +113,7 @@ npm run validate
 1. 同步更新根目录、Codex 插件和技能运行包的 semver 版本。
 2. 更新 `CHANGELOG.md`。
 3. 运行 `npm run validate` 和真实 Markdown 渲染测试。
-4. 创建对应的 `vX.Y.Z` Git tag，再推送到远端。
+4. 运行 `npm pack --dry-run --json`，确认 DSH patch 和完整技能资产在包内。
+5. 创建对应的 `vX.Y.Z` Git tag，再推送到远端。
 
 当前仓库保持 `UNLICENSED`，在明确开源许可前不得视为已授权公开再分发。

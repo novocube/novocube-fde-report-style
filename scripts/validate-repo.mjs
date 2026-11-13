@@ -55,6 +55,36 @@ if (repositoryPackage.version !== manifest.version) fail("repository and plugin 
 if (repositoryPackage.scripts?.["install:dsh"] !== "node scripts/install-dsh.mjs") {
   fail("DSH installer script is not exposed through npm");
 }
+if (repositoryPackage.dsh?.bundle?.patch !== "./cordis.patch.yml") {
+  fail("root package does not declare dsh.bundle.patch");
+}
+if (!repositoryPackage.keywords?.includes("dsh-plugin")) fail("root package is missing the dsh-plugin keyword");
+const packageFiles = new Set(repositoryPackage.files || []);
+for (const required of [
+  "cordis.patch.yml",
+  ".agents/plugins/marketplace.json",
+  `.dsh/skills/${pluginName}/SKILL.md`,
+  `plugins/${pluginName}/`,
+  "scripts/",
+]) {
+  if (!packageFiles.has(required)) fail(`npm package files do not include ${required}`);
+}
+
+const dshPatchPath = requireFile("cordis.patch.yml");
+const dshPatch = fs.readFileSync(dshPatchPath, "utf8");
+for (const fragment of [
+  "- insert:",
+  `id: ${pluginName}-skill-provider`,
+  "name: '@deepseek-ai/dsh-skill-filesystem'",
+  `providerName: ${pluginName}`,
+  "includeDefaultRoots: false",
+  "watch: false",
+  "bundledSkillDir: !!js",
+  `resolve('${repositoryPackage.name}/package.json')`,
+  `'plugins', '${pluginName}', 'skills'`,
+]) {
+  if (!dshPatch.includes(fragment)) fail(`DSH bundle patch is missing: ${fragment}`);
+}
 
 const skillRoot = `plugins/${pluginName}/skills/${pluginName}`;
 const skillMdPath = requireFile(`${skillRoot}/SKILL.md`);

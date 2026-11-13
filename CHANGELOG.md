@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.1 - 2026-11-13
+
+- 将仓库根包改为 DSH 可安装 bundle，新增 `dsh.bundle.patch` 和 `cordis.patch.yml`。
+- 在 bundle patch 中增量插入独立 `@deepseek-ai/dsh-skill-filesystem` provider，指向包内实际技能目录。
+- 使用安装包位置解析 `bundledSkillDir`，不依赖 DSH 启动时的工作目录。
+- 增加 npm 包文件白名单，确保 DSH 安装包包含 patch、`SKILL.md`、渲染脚本、样式和字体。
+
 ## 0.2.0 - 2026-11-13
 
 - 新增 DeepSeek Harness（DSH）原生 `.dsh/skills` 项目入口。

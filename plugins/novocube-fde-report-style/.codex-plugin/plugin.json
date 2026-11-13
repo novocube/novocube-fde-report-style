@@ -1,6 +1,6 @@
 {
   "name": "novocube-fde-report-style",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Convert Markdown into polished, self-contained A4 PDF reports using the default Novocube-fde-report-style.",
   "author": {
     "name": "新魔方"
