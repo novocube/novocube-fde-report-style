@@ -5,9 +5,11 @@
 ## 功能
 
 - 将 Markdown、GFM 表格和图片渲染为 A4 PDF。
+- 封面和正文右上角使用“新魔方 · FDE REPORT”，不使用 `AIGC`/`AGIC` 角标。
 - 支持 Markdown 内嵌 `data:` 图片和相对路径本地图片。
 - 默认使用 `Novocube-fde-report-style`，并把正文中的 `Novocube`/`NOVOCUBE` 规范化为“新魔方”。
-- 默认不显示日期；仅在显式传入 `--date` 时添加。
+- 默认不显示日期；可用 `--date` 指定日期，或用 `--include-source-date` 采用 Markdown 中的日期。
+- 随插件提供 Noto Sans CJK SC Regular/Bold，渲染时直接加载并嵌入 PDF，用户无需安装字体。
 - 使用 Codex 内置 Node.js、`marked`、Playwright 和 Chrome；也支持独立 Node.js 环境。
 
 ## Codex 安装
@@ -39,7 +41,8 @@ node plugins/novocube-fde-report-style/skills/novocube-fde-report-style/scripts/
 
 - `--title`、`--subtitle`：覆盖封面标题。
 - `--brand`：覆盖页眉品牌，默认“新魔方”。
-- `--date`：显式添加封面日期；默认不添加。
+- `--date`：显式添加指定封面日期；默认不添加。
+- `--include-source-date`：从 frontmatter 或独立日期行读取日期并显示在封面。
 - `--no-replace-legacy-brand`：保留正文中的 `Novocube`。
 - `--keep-html`：保留已解析图片的中间 HTML。
 - `--browser`：指定 Chrome/Chromium 可执行文件。
@@ -55,7 +58,7 @@ scripts/validate-repo.mjs               无第三方依赖的结构校验
 .github/workflows/validate.yml          GitHub Actions 校验
 ```
 
-默认样式资产位于 `assets/Novocube-fde-report-style/`，其中 `reference.pdf` 是视觉基准，`style.css` 是实际渲染样式，`style.json` 保存样式 ID 与默认设置。
+默认样式资产位于 `assets/Novocube-fde-report-style/`，其中 `reference.pdf` 是视觉基准，`style.css` 是实际渲染样式，`style.json` 保存样式 ID 与默认设置，`fonts/` 包含 Noto Sans CJK SC Regular/Bold 和 SIL OFL 1.1 许可证。
 
 ## 开发与发布
 

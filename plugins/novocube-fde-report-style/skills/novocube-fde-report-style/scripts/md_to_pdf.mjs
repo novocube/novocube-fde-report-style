@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { createRequire } from "node:module";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 const require = createRequire(import.meta.url);
 
@@ -24,6 +24,7 @@ Options:
   --brand TEXT                  Header brand (default: 新魔方)
   --eyebrow TEXT                Cover eyebrow
   --date TEXT                   Explicit cover date; omitted by default
+  --include-source-date         Use a source/frontmatter date on the cover
   --style NAME                  Style name (default: Novocube-fde-report-style)
   --no-replace-legacy-brand     Preserve Novocube/NOVOCUBE in content
   --keep-html PATH              Save resolved intermediate HTML
@@ -40,6 +41,7 @@ function parseArgs(argv) {
     brand: "新魔方",
     eyebrow: null,
     date: null,
+    includeSourceDate: false,
     style: "Novocube-fde-report-style",
     replaceLegacyBrand: true,
     keepHtml: null,
@@ -64,6 +66,10 @@ function parseArgs(argv) {
     }
     if (arg === "--no-replace-legacy-brand") {
       out.replaceLegacyBrand = false;
+      continue;
+    }
+    if (arg === "--include-source-date") {
+      out.includeSourceDate = true;
       continue;
     }
     if (valueOptions.has(arg)) {
@@ -138,9 +144,16 @@ function deriveDocument(markdown, options) {
   const sourceTitle = options.title || front.meta.title || (heading ? heading[1].trim() : path.parse(options.input).name);
   if (heading) body = `${body.slice(0, heading.index)}${body.slice(heading.index + heading[0].length)}`;
 
-  body = body.replace(/^\s*(?:date\s*:\s*)?\d{4}[-/.年]\d{1,2}[-/.月]\d{1,2}日?\s*$/gim, "");
-  body = body.replace(/^\s*\d{1,2}\s+[A-Za-z]+\s+\d{4}\s*$/gim, "");
-  body = body.replace(/^\s*[A-Za-z]+\s+\d{1,2},\s+\d{4}\s*$/gim, "");
+  let sourceDate = front.meta.date || "";
+  const stripDate = (pattern) => {
+    body = body.replace(pattern, (full, value) => {
+      if (!sourceDate) sourceDate = value.trim();
+      return "";
+    });
+  };
+  stripDate(/^\s*(?:date\s*:\s*)?(\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{4}年\d{1,2}月\d{1,2}日)\s*$/gim);
+  stripDate(/^\s*(\d{1,2}\s+[A-Za-z]+\s+\d{4})\s*$/gim);
+  stripDate(/^\s*([A-Za-z]+\s+\d{1,2},\s+\d{4})\s*$/gim);
 
   let title = sourceTitle;
   let subtitle = options.subtitle;
@@ -159,8 +172,39 @@ function deriveDocument(markdown, options) {
     body: body.trim(),
     title: title.trim(),
     subtitle: subtitle ? subtitle.trim() : "",
+    sourceDate: sourceDate.trim(),
     meta: front.meta,
   };
+}
+
+function loadBundledFonts(styleRoot) {
+  const fontRoot = path.join(styleRoot, "fonts");
+  const regular = path.join(fontRoot, "NotoSansCJKsc-Regular.otf");
+  const bold = path.join(fontRoot, "NotoSansCJKsc-Bold.otf");
+  for (const fontPath of [regular, bold]) {
+    if (!fs.statSync(fontPath, { throwIfNoEntry: false })?.isFile()) {
+      fail(`bundled font missing: ${fontPath}`);
+    }
+  }
+  const family = "Novocube Noto Sans CJK SC";
+  const pageCss = `
+@font-face {
+  font-family: "${family}";
+  src: url("${pathToFileURL(regular).href}") format("opentype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: block;
+}
+@font-face {
+  font-family: "${family}";
+  src: url("${pathToFileURL(bold).href}") format("opentype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: block;
+}`;
+  const regularData = fs.readFileSync(regular).toString("base64");
+  const templateCss = `@font-face{font-family:'${family}';src:url(data:font/otf;base64,${regularData}) format('opentype');font-style:normal;font-weight:400;}`;
+  return { family, pageCss, templateCss };
 }
 
 function mimeFor(filePath) {
@@ -254,7 +298,8 @@ async function main() {
 
   const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
   const styleRoot = path.join(skillRoot, "assets", "Novocube-fde-report-style");
-  const css = fs.readFileSync(path.join(styleRoot, "style.css"), "utf8");
+  const fonts = loadBundledFonts(styleRoot);
+  const css = `${fonts.pageCss}\n${fs.readFileSync(path.join(styleRoot, "style.css"), "utf8")}`;
   const markdown = fs.readFileSync(options.input, "utf8");
   const document = deriveDocument(markdown, options);
   const { marked } = loadDependency("marked");
@@ -264,30 +309,39 @@ async function main() {
   contentHtml = await inlineLocalImages(contentHtml, path.dirname(options.input));
 
   const eyebrow = options.eyebrow || `${options.brand} · SOLUTION BRIEF`;
+  const coverDate = options.date || (options.includeSourceDate ? document.sourceDate : "");
   const html = buildHtml({
     css,
     contentHtml,
     title: document.title,
     subtitle: document.subtitle,
     eyebrow,
-    date: options.date,
+    date: coverDate,
   });
 
   fs.mkdirSync(path.dirname(options.output), { recursive: true });
+  let temporaryHtmlDir = null;
+  let renderHtmlPath;
   if (options.keepHtml) {
     const keepHtml = path.resolve(options.keepHtml);
     fs.mkdirSync(path.dirname(keepHtml), { recursive: true });
     fs.writeFileSync(keepHtml, html, "utf8");
+    renderHtmlPath = keepHtml;
+  } else {
+    temporaryHtmlDir = fs.mkdtempSync(path.join(os.tmpdir(), "novocube-fde-report-"));
+    renderHtmlPath = path.join(temporaryHtmlDir, "document.html");
+    fs.writeFileSync(renderHtmlPath, html, "utf8");
   }
 
   const executablePath = findBrowser(options, chromium);
   const browser = await chromium.launch({
     ...(executablePath ? { executablePath } : {}),
     headless: true,
+    args: ["--allow-file-access-from-files"],
   });
   try {
     const page = await browser.newPage({ viewport: { width: 1240, height: 1754 }, deviceScaleFactor: 1 });
-    await page.setContent(html, { waitUntil: "load", timeout: 120000 });
+    await page.goto(pathToFileURL(renderHtmlPath).href, { waitUntil: "load", timeout: 120000 });
     await page.evaluate(async () => {
       if (document.fonts?.ready) await document.fonts.ready;
       await Promise.all(Array.from(document.images).map((img) => {
@@ -299,21 +353,23 @@ async function main() {
       }));
     });
     await page.emulateMedia({ media: "print" });
-    const headerBrand = escapeHtml(`${options.brand} · AIGC SCALE PRODUCTION`);
+    const headerBrand = escapeHtml(`${options.brand} · FDE REPORT`);
+    const templateStyle = `<style>${fonts.templateCss}</style>`;
     await page.pdf({
       path: options.output,
       format: "A4",
       printBackground: true,
       preferCSSPageSize: true,
       displayHeaderFooter: true,
-      headerTemplate: `<div style="width:100%;padding:0 16mm;text-align:right;font-family:'Noto Sans CJK SC','PingFang SC',Arial,sans-serif;font-size:7px;color:#3d4653;">${headerBrand}</div>`,
-      footerTemplate: `<div style="width:100%;text-align:center;font-family:'Noto Sans CJK SC','PingFang SC',Arial,sans-serif;font-size:7px;color:#3d4653;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
+      headerTemplate: `${templateStyle}<div style="width:100%;padding:0 16mm;text-align:right;font-family:'${fonts.family}',sans-serif;font-size:7px;color:#3d4653;">${headerBrand}</div>`,
+      footerTemplate: `${templateStyle}<div style="width:100%;text-align:center;font-family:'${fonts.family}',sans-serif;font-size:7px;color:#3d4653;"><span class="pageNumber"></span> / <span class="totalPages"></span></div>`,
       margin: { top: "16mm", right: "0", bottom: "15mm", left: "0" },
       tagged: true,
       outline: true,
     });
   } finally {
     await browser.close();
+    if (temporaryHtmlDir) fs.rmSync(temporaryHtmlDir, { recursive: true, force: true });
   }
 
   console.log(JSON.stringify({
@@ -322,7 +378,9 @@ async function main() {
     style: options.style,
     title: document.title,
     subtitle: document.subtitle,
-    dateVisible: Boolean(options.date),
+    dateVisible: Boolean(coverDate),
+    dateSource: options.date ? "explicit" : (options.includeSourceDate && document.sourceDate ? "source" : "none"),
+    bundledFonts: ["NotoSansCJKsc-Regular.otf", "NotoSansCJKsc-Bold.otf"],
     legacyBrandReplaced: options.replaceLegacyBrand,
   }, null, 2));
 }

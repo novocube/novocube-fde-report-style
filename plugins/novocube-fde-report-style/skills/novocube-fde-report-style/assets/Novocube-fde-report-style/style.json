@@ -1,13 +1,15 @@
 {
   "id": "Novocube-fde-report-style",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "default": true,
   "page": {
     "size": "A4",
     "orientation": "portrait",
     "showDate": false,
+    "dateMode": "optional",
     "showHeader": true,
-    "showPageNumbers": true
+    "showPageNumbers": true,
+    "headerLabel": "FDE REPORT"
   },
   "brand": {
     "displayName": "新魔方",
@@ -23,7 +25,13 @@
     "muted": "#566173"
   },
   "typography": {
-    "cjk": "Noto Sans CJK SC",
+    "cjk": "Novocube Noto Sans CJK SC",
+    "bundled": true,
+    "files": {
+      "regular": "fonts/NotoSansCJKsc-Regular.otf",
+      "bold": "fonts/NotoSansCJKsc-Bold.otf",
+      "license": "fonts/OFL.txt"
+    },
     "fallbacks": [
       "PingFang SC",
       "Microsoft YaHei",

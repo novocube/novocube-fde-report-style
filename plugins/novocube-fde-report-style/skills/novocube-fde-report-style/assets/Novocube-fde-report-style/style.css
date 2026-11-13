@@ -24,7 +24,7 @@ body {
   padding: 0;
   background: var(--paper);
   color: var(--text);
-  font-family: "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  font-family: "Novocube Noto Sans CJK SC", sans-serif;
   font-size: 9.6pt;
   line-height: 1.58;
   -webkit-print-color-adjust: exact;

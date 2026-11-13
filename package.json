@@ -1,6 +1,6 @@
 {
   "name": "novocube-fde-report-style-repo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Codex marketplace repository for the Novocube FDE Markdown-to-PDF report style plugin.",
   "type": "module",

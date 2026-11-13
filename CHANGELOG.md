@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.1 - 2026-11-13
+
+- 将页眉角标改为“新魔方 · FDE REPORT”，移除 AIGC 字样。
+- 保持封面默认无日期，同时新增 `--include-source-date` 和已有的 `--date` 显式日期选项。
+- 随插件打包 Noto Sans CJK SC Regular/Bold 与 SIL OFL 1.1 许可证，不再依赖用户安装中文字体。
+
 ## 0.1.0 - 2026-11-13
 
 - 首次仓库化发布。

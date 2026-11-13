@@ -5,7 +5,7 @@ description: Convert Markdown files into polished A4 PDF reports with a blue cov
 
 # Novocube FDE Report Style
 
-Use the bundled renderer for deterministic Markdown-to-PDF conversion. Treat `Novocube-fde-report-style` as the default and canonical style. Do not add a visible date unless the user explicitly asks for one.
+Use the bundled renderer for deterministic Markdown-to-PDF conversion. Treat `Novocube-fde-report-style` as the default and canonical style. Default to no visible date, but honor an explicit request to add a date. Use the bundled Noto Sans CJK SC fonts; never require the user to install fonts.
 
 ## Render
 
@@ -22,7 +22,8 @@ If those paths do not exist, use `node` and set `NODE_PATH` to a directory conta
 
 3. Preserve embedded `data:` images and inline local relative images. The renderer inlines local image files before printing.
 4. Keep the default brand normalization unless the user asks to preserve legacy spelling. By default, visible `Novocube`/`NOVOCUBE` text becomes `新魔方`.
-5. Verify the output exists, has the expected number of pages, contains no accidental date, and visually inspect every page for clipping or missing images. Use the PDF skill when available for visual verification.
+5. Keep the top-right header label brand-specific: `${brand} · FDE REPORT`. Do not put `AIGC` or `AGIC` in that label.
+6. Verify the output exists, has the expected number of pages, follows the requested date mode, and visually inspect every page for clipping, font fallback, or missing images. Use the PDF skill when available for visual verification.
 
 ## Options
 
@@ -31,8 +32,9 @@ If those paths do not exist, use `node` and set `NODE_PATH` to a directory conta
 - `--brand TEXT`: override the header brand; defaults to `新魔方`.
 - `--eyebrow TEXT`: override the cover eyebrow.
 - `--no-replace-legacy-brand`: keep `Novocube` text in content.
-- `--date TEXT`: explicitly add a date to the cover. Omit this option by default.
+- `--date TEXT`: explicitly add the supplied date to the cover. Omit this option by default.
+- `--include-source-date`: use a frontmatter date or standalone source date on the cover. This is opt-in.
 - `--keep-html PATH`: save the fully resolved intermediate HTML for debugging.
 - `--browser PATH`: use a specific Chromium/Chrome executable.
 
-Read [style-spec.md](references/style-spec.md) only when modifying the style or comparing a new render to the canonical template. The canonical CSS, style manifest, and reference PDF are under `assets/Novocube-fde-report-style/`.
+Read [style-spec.md](references/style-spec.md) only when modifying the style or comparing a new render to the canonical template. The canonical CSS, style manifest, reference PDF, bundled fonts, and font license are under `assets/Novocube-fde-report-style/`.

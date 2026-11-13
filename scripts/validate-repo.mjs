@@ -61,14 +61,25 @@ if (skillMd.includes("[TODO:")) fail("SKILL.md contains a TODO placeholder");
 requireFile(`${skillRoot}/agents/openai.yaml`);
 requireFile(`${skillRoot}/references/style-spec.md`);
 const renderer = requireFile(`${skillRoot}/scripts/md_to_pdf.mjs`);
+const rendererSource = fs.readFileSync(renderer, "utf8");
+if (!rendererSource.includes("FDE REPORT")) fail("renderer header label is not brand-specific");
+if (/AIGC SCALE PRODUCTION|AGIC/i.test(rendererSource)) fail("renderer contains a forbidden header label");
+if (!rendererSource.includes("--include-source-date")) fail("optional source date mode is missing");
 const styleRoot = `${skillRoot}/assets/${styleName}`;
 const style = readJson(`${styleRoot}/style.json`);
 if (style.id !== styleName || style.default !== true) fail("default style identity is invalid");
+if (style.page?.dateMode !== "optional" || style.page?.showDate !== false) {
+  fail("default date mode must be hidden but optional");
+}
 requireFile(`${styleRoot}/style.css`);
 const reference = requireFile(`${styleRoot}/reference.pdf`);
 if (!fs.readFileSync(reference).subarray(0, 5).equals(Buffer.from("%PDF-"))) {
   fail("reference.pdf is not a PDF file");
 }
+requireFile(`${styleRoot}/fonts/NotoSansCJKsc-Regular.otf`);
+requireFile(`${styleRoot}/fonts/NotoSansCJKsc-Bold.otf`);
+const fontLicense = fs.readFileSync(requireFile(`${styleRoot}/fonts/OFL.txt`), "utf8");
+if (!fontLicense.includes("SIL OPEN FONT LICENSE Version 1.1")) fail("font license is missing or invalid");
 
 const syntax = spawnSync(process.execPath, ["--check", renderer], { encoding: "utf8" });
 if (syntax.status !== 0) fail(`renderer syntax error: ${syntax.stderr.trim()}`);

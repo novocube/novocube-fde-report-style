@@ -1,7 +1,7 @@
 {
   "name": "novocube-fde-report-style",
-  "version": "0.1.0",
-  "description": "Convert Markdown into polished A4 PDF reports using the default Novocube-fde-report-style.",
+  "version": "0.1.1",
+  "description": "Convert Markdown into polished, self-contained A4 PDF reports using the default Novocube-fde-report-style.",
   "author": {
     "name": "新魔方"
   },
@@ -17,7 +17,7 @@
   "interface": {
     "displayName": "Novocube FDE Report Style",
     "shortDescription": "将 Markdown 转为统一蓝色品牌报告 PDF",
-    "longDescription": "将 Markdown、表格和内嵌或本地图片渲染为带蓝色封面、品牌页眉、页码和嵌入字体的 A4 PDF。默认样式为 Novocube-fde-report-style，默认不显示日期。",
+    "longDescription": "将 Markdown、表格和内嵌或本地图片渲染为带蓝色封面、新魔方品牌页眉、页码和自带中文字体的 A4 PDF。默认不显示日期，也可显式加入日期。",
     "developerName": "新魔方",
     "category": "Productivity",
     "capabilities": [
