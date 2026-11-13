@@ -1,0 +1,276 @@
+:root {
+  --blue: #174a82;
+  --mid-blue: #1a5aa6;
+  --pale-blue: #dce9f7;
+  --pale-row: #f5f8fc;
+  --line-blue: #b8cbe2;
+  --text: #162033;
+  --muted: #566173;
+  --paper: #ffffff;
+}
+
+@page {
+  size: A4 portrait;
+  margin: 16mm 16mm 15mm;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--paper);
+  color: var(--text);
+  font-family: "Noto Sans CJK SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+  font-size: 9.6pt;
+  line-height: 1.58;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+body {
+  overflow-wrap: break-word;
+}
+
+.cover {
+  position: relative;
+  min-height: 258mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  break-after: page;
+  page-break-after: always;
+  overflow: hidden;
+}
+
+.cover::before {
+  content: "";
+  position: absolute;
+  width: 102mm;
+  height: 102mm;
+  top: -60mm;
+  right: -56mm;
+  border-radius: 50%;
+  background: var(--pale-blue);
+  box-shadow: 0 0 0 13mm rgba(23, 74, 130, 0.08);
+}
+
+.cover::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 19mm;
+  width: 48mm;
+  height: 2.2mm;
+  background: var(--mid-blue);
+  box-shadow: 48mm 0 0 var(--line-blue), 96mm 0 0 var(--pale-blue);
+}
+
+.cover-eyebrow {
+  margin: 0 0 12mm;
+  color: var(--mid-blue);
+  font-size: 10.5pt;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.cover-title {
+  max-width: 165mm;
+  margin: 0;
+  color: var(--blue);
+  font-size: 26pt;
+  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: 0.01em;
+}
+
+.cover-subtitle {
+  max-width: 165mm;
+  margin: 2.5mm 0 0;
+  color: var(--blue);
+  font-size: 25pt;
+  font-weight: 700;
+  line-height: 1.24;
+}
+
+.cover-date {
+  margin-top: 10mm;
+  color: var(--muted);
+  font-size: 9pt;
+}
+
+main {
+  width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--blue);
+  break-after: avoid;
+  page-break-after: avoid;
+}
+
+h1 {
+  margin: 0 0 4mm;
+  font-size: 20pt;
+  line-height: 1.25;
+}
+
+h2 {
+  margin: 5.2mm 0 3mm;
+  padding: 0 0 1.7mm 3.2mm;
+  border-left: 2.2mm solid var(--mid-blue);
+  border-bottom: 0.35mm solid var(--line-blue);
+  font-size: 16.5pt;
+  line-height: 1.2;
+}
+
+h3 {
+  margin: 4mm 0 2mm;
+  font-size: 12.5pt;
+  line-height: 1.3;
+}
+
+h4 {
+  margin: 3mm 0 1.6mm;
+  font-size: 10.5pt;
+}
+
+p {
+  margin: 0 0 2.1mm;
+  text-align: justify;
+  widows: 2;
+  orphans: 2;
+}
+
+strong {
+  color: #103e70;
+}
+
+a {
+  color: var(--mid-blue);
+  text-decoration: none;
+}
+
+ul,
+ol {
+  margin: 1mm 0 2.5mm 5.6mm;
+  padding-left: 4.5mm;
+}
+
+li {
+  margin: 0 0 1mm;
+  break-inside: avoid;
+}
+
+blockquote {
+  margin: 3mm 0;
+  padding: 2.6mm 3.5mm;
+  border-left: 1.5mm solid var(--mid-blue);
+  background: var(--pale-row);
+  color: #33435a;
+  break-inside: avoid;
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+table {
+  width: 100%;
+  margin: 3mm 0 4mm;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 8.2pt;
+  line-height: 1.38;
+}
+
+thead {
+  display: table-header-group;
+}
+
+tr {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+th,
+td {
+  padding: 2.2mm 2.4mm;
+  border: 0.25mm solid var(--line-blue);
+  vertical-align: middle;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+th {
+  background: var(--pale-blue);
+  color: var(--blue);
+  font-weight: 700;
+}
+
+tbody tr:nth-child(even) td {
+  background: var(--pale-row);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 3mm auto;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+p > img:only-child {
+  width: 100%;
+  margin: 3mm auto 2mm;
+}
+
+code {
+  padding: 0.15em 0.35em;
+  border-radius: 2px;
+  background: #eef3f8;
+  color: #123b65;
+  font-family: "Liberation Mono", "SFMono-Regular", Consolas, monospace;
+  font-size: 0.9em;
+}
+
+pre {
+  margin: 3mm 0;
+  padding: 3mm;
+  border: 0.25mm solid var(--line-blue);
+  border-radius: 2px;
+  background: #f7f9fc;
+  white-space: pre-wrap;
+  break-inside: avoid;
+}
+
+pre code {
+  padding: 0;
+  background: transparent;
+}
+
+hr {
+  margin: 5mm 0;
+  border: 0;
+  border-top: 0.35mm solid var(--line-blue);
+}
+
+.task-list-item {
+  list-style: none;
+}
+
+@media print {
+  a[href]::after {
+    content: none;
+  }
+}

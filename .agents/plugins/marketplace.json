@@ -1,0 +1,20 @@
+{
+  "name": "novocube-fde-report-style",
+  "interface": {
+    "displayName": "Novocube FDE Report Style"
+  },
+  "plugins": [
+    {
+      "name": "novocube-fde-report-style",
+      "source": {
+        "source": "local",
+        "path": "./plugins/novocube-fde-report-style"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

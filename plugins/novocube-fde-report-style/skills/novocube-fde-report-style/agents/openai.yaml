@@ -1,0 +1,8 @@
+interface:
+  display_name: "Novocube FDE Report Style"
+  short_description: "将 Markdown 转为统一蓝色品牌报告 PDF"
+  brand_color: "#174A82"
+  default_prompt: "Use $novocube-fde-report-style to convert this Markdown file into a polished PDF with the default blue report style."
+
+policy:
+  allow_implicit_invocation: true

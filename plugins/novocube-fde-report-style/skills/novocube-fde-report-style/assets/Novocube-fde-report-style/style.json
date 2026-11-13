@@ -1,0 +1,34 @@
+{
+  "id": "Novocube-fde-report-style",
+  "version": "1.0.0",
+  "default": true,
+  "page": {
+    "size": "A4",
+    "orientation": "portrait",
+    "showDate": false,
+    "showHeader": true,
+    "showPageNumbers": true
+  },
+  "brand": {
+    "displayName": "新魔方",
+    "replaceLegacyNovocube": true
+  },
+  "colors": {
+    "primary": "#174A82",
+    "accent": "#1A5AA6",
+    "pale": "#DCE9F7",
+    "zebra": "#F5F8FC",
+    "rule": "#B8CBE2",
+    "text": "#162033",
+    "muted": "#566173"
+  },
+  "typography": {
+    "cjk": "Noto Sans CJK SC",
+    "fallbacks": [
+      "PingFang SC",
+      "Microsoft YaHei",
+      "Arial",
+      "sans-serif"
+    ]
+  }
+}
