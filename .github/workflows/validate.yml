@@ -1,4 +1,4 @@
-name: Validate Codex plugin
+name: Validate Codex and DSH skill
 
 on:
   push:

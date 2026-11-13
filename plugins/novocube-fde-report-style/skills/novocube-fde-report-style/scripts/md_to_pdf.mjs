@@ -8,6 +8,8 @@ import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const require = createRequire(import.meta.url);
+const scriptDir = path.dirname(fileURLToPath(import.meta.url));
+const installedSkillRoot = path.resolve(scriptDir, "..");
 
 function fail(message, code = 1) {
   console.error(`Error: ${message}`);
@@ -91,8 +93,10 @@ function parseArgs(argv) {
 function moduleSearchPaths() {
   const home = os.homedir();
   return [
-    process.env.NODE_PATH,
-    process.env.CODEX_NODE_PATH,
+    ...(process.env.NODE_PATH || "").split(path.delimiter),
+    ...(process.env.CODEX_NODE_PATH || "").split(path.delimiter),
+    path.join(installedSkillRoot, "node_modules"),
+    path.join(installedSkillRoot, "..", "..", "..", "..", "node_modules"),
     path.join(home, ".cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules"),
     path.join(process.cwd(), "node_modules"),
   ].filter(Boolean);
@@ -103,7 +107,7 @@ function loadDependency(name) {
     const resolved = require.resolve(name, { paths: moduleSearchPaths() });
     return require(resolved);
   } catch (error) {
-    fail(`cannot load '${name}'. Run with Codex bundled Node.js or set NODE_PATH. ${error.message}`);
+    fail(`cannot load '${name}'. Run 'npm install' in the installed skill or repository, or use the Codex bundled Node.js runtime. ${error.message}`);
   }
 }
 
@@ -187,22 +191,23 @@ function loadBundledFonts(styleRoot) {
     }
   }
   const family = "Novocube Noto Sans CJK SC";
+  const regularData = fs.readFileSync(regular).toString("base64");
+  const boldData = fs.readFileSync(bold).toString("base64");
   const pageCss = `
 @font-face {
   font-family: "${family}";
-  src: url("${pathToFileURL(regular).href}") format("opentype");
+  src: url("data:font/otf;base64,${regularData}") format("opentype");
   font-style: normal;
   font-weight: 400;
   font-display: block;
 }
 @font-face {
   font-family: "${family}";
-  src: url("${pathToFileURL(bold).href}") format("opentype");
+  src: url("data:font/otf;base64,${boldData}") format("opentype");
   font-style: normal;
   font-weight: 700;
   font-display: block;
 }`;
-  const regularData = fs.readFileSync(regular).toString("base64");
   const templateCss = `@font-face{font-family:'${family}';src:url(data:font/otf;base64,${regularData}) format('opentype');font-style:normal;font-weight:400;}`;
   return { family, pageCss, templateCss };
 }
@@ -247,12 +252,22 @@ async function inlineLocalImages(html, baseDir) {
 }
 
 function findBrowser(options, chromium) {
+  const programFiles = process.env.PROGRAMFILES || "";
+  const programFilesX86 = process.env["PROGRAMFILES(X86)"] || "";
+  const localAppData = process.env.LOCALAPPDATA || "";
   const candidates = [
     options.browser,
     process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
     "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
     "/Applications/Chromium.app/Contents/MacOS/Chromium",
     "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge",
+    "/usr/bin/google-chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+    programFiles && path.join(programFiles, "Google", "Chrome", "Application", "chrome.exe"),
+    programFilesX86 && path.join(programFilesX86, "Microsoft", "Edge", "Application", "msedge.exe"),
+    localAppData && path.join(localAppData, "Google", "Chrome", "Application", "chrome.exe"),
   ].filter(Boolean);
   for (const candidate of candidates) {
     if (fs.existsSync(candidate)) return candidate;
@@ -296,7 +311,7 @@ async function main() {
   options.output = path.resolve(options.output || path.join(path.dirname(options.input), `${path.parse(options.input).name}.pdf`));
   if (path.extname(options.output).toLowerCase() !== ".pdf") fail("output path must end in .pdf", 2);
 
-  const skillRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+  const skillRoot = installedSkillRoot;
   const styleRoot = path.join(skillRoot, "assets", "Novocube-fde-report-style");
   const fonts = loadBundledFonts(styleRoot);
   const css = `${fonts.pageCss}\n${fs.readFileSync(path.join(styleRoot, "style.css"), "utf8")}`;

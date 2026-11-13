@@ -1,0 +1,14 @@
+{
+  "name": "novocube-fde-report-style-skill",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Runtime dependencies for the Novocube FDE report style Agent Skill.",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "marked": "17.0.5",
+    "playwright": "1.62.1"
+  }
+}

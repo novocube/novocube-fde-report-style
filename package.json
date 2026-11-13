@@ -1,10 +1,11 @@
 {
   "name": "novocube-fde-report-style-repo",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
-  "description": "Codex marketplace repository for the Novocube FDE Markdown-to-PDF report style plugin.",
+  "description": "Codex and DeepSeek Harness skill repository for the Novocube FDE Markdown-to-PDF report style.",
   "type": "module",
   "scripts": {
+    "install:dsh": "node scripts/install-dsh.mjs",
     "validate": "node scripts/validate-repo.mjs"
   },
   "engines": {

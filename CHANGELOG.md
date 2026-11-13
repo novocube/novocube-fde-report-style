@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 - 2026-11-13
+
+- 新增 DeepSeek Harness（DSH）原生 `.dsh/skills` 项目入口。
+- 新增 `npm run install:dsh`，支持用户级、项目级和自定义目录安装。
+- 为 DSH/独立安装提供技能本地 `package.json`，并增强渲染器的依赖发现。
+- 将正文字体直接内嵌到渲染 HTML，避免 DSH 临时目录下的浏览器本地字体访问限制。
+- 移除技能指南中的用户专属 Codex 绝对路径，改为 Codex/DSH 通用调用方式。
+
 ## 0.1.1 - 2026-11-13
 
 - 将页眉角标改为“新魔方 · FDE REPORT”，移除 AIGC 字样。

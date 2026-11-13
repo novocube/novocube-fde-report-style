@@ -1,6 +1,6 @@
 ---
 name: novocube-fde-report-style
-description: Convert Markdown files into polished A4 PDF reports with a blue cover, embedded images, branded headers, page numbering, Chinese typography, styled headings and tables. Use when Codex is asked to export, convert, render, or typeset .md/Markdown as PDF in the Novocube FDE report style, reproduce the saved report template, omit cover dates, or apply the default Novocube-fde-report-style.
+description: Convert Markdown files into polished A4 PDF reports with a blue cover, embedded images, branded headers, page numbering, Chinese typography, styled headings and tables. Use when Codex or DeepSeek Harness (DSH) is asked to export, convert, render, or typeset .md/Markdown as PDF in the Novocube FDE report style, reproduce the saved report template, omit cover dates, or apply the default Novocube-fde-report-style.
 ---
 
 # Novocube FDE Report Style
@@ -10,15 +10,14 @@ Use the bundled renderer for deterministic Markdown-to-PDF conversion. Treat `No
 ## Render
 
 1. Resolve the input Markdown path and desired output path.
-2. Run the renderer with the Codex bundled Node.js runtime when available:
+2. Resolve the skill directory (the folder containing this `SKILL.md`) and run the bundled renderer:
 
 ```bash
-NODE_PATH="/Users/zemingz/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules" \
-  /Users/zemingz/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node \
-  scripts/md_to_pdf.mjs INPUT.md --output OUTPUT.pdf
+SKILL_DIR="/absolute/path/to/novocube-fde-report-style"
+node "$SKILL_DIR/scripts/md_to_pdf.mjs" INPUT.md --output OUTPUT.pdf
 ```
 
-If those paths do not exist, use `node` and set `NODE_PATH` to a directory containing `marked` and `playwright`. The script also searches standard Codex runtime locations automatically.
+In DSH, resolve this from the loaded skill's resource directory; in Codex, use the absolute path of this installed skill. The renderer searches skill-local dependencies, repository dependencies, `NODE_PATH`, and the standard Codex runtime. If `marked` or `playwright` is unavailable in a standalone/DSH installation, run `npm install` once in the skill directory. If Chrome/Chromium is unavailable, run `npx playwright install chromium` there or pass `--browser PATH`.
 
 3. Preserve embedded `data:` images and inline local relative images. The renderer inlines local image files before printing.
 4. Keep the default brand normalization unless the user asks to preserve legacy spelling. By default, visible `Novocube`/`NOVOCUBE` text becomes `新魔方`.
